@@ -1,0 +1,6 @@
+streamlit
+fuzzywuzzy
+python-levenshtein
+Pillow
+PyPDF2
+rapidfuzz  # fuzzywuzzy से भी तेज़ और अच्छा काम करता है (optional लेकिन recommended)
