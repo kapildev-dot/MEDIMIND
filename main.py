@@ -3,6 +3,7 @@ import pandas as pd
 from fuzzywuzzy import fuzz
 import re
 import google.generativeai as genai
+import google.generativeai.types as types # ⬅️ यह line जोड़ें
 import time
 import json
 import random
@@ -711,4 +712,5 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
