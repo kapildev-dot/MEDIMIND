@@ -7,6 +7,22 @@ import time
 import json
 import random
 
+# ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+# ये 4 लाइनें अभी जोड़ दो (सबसे ऊपर, title से पहले)
+
+try:
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    st.success("Gemini API Key successfully loaded!")
+except Exception as e:
+    st.error("Gemini API Key error!")
+    st.error(f"Details: {e}")
+    st.stop()   # अगर key नहीं मिली तो app आगे नहीं चलेगी
+# ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+
+# अब तुम्हारा बाकी सारा code नीचे रहेगा
+st.title("MEDIMIND - Prescription Reader")
+# ... बाकी तुम्हारा पूरा code वैसा का वैसा
+
 # ---- Page Config ----
 st.set_page_config(
     page_title="MediMind AI Doctor - PRO V10 (Ultimate Professional)",
@@ -695,3 +711,4 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
