@@ -3,30 +3,21 @@ import pandas as pd
 from fuzzywuzzy import fuzz
 import re
 import google.generativeai as genai
-import google.generativeai.types as types # Added the necessary types import
 import time
 import json
 import random
 
-# ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
-# ये 4 लाइनें अभी जोड़ दो (सबसे ऊपर, title से पहले)
-
-# 1. Primary Key Configuration Check
+# सिर्फ ये एक बार ही रखो
 try:
-    # Use genai.configure to set the API key globally
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     st.success("Gemini API Key successfully loaded!")
-    # Global variable to track if API is available
-    GEMINI_ENABLED = True
 except Exception as e:
     st.error("Gemini API Key error!")
     st.error(f"Details: {e}")
-    GEMINI_ENABLED = False
-    st.stop()    # अगर key नहीं मिली तो app आगे नहीं चलेगी
-# ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+    st.stop()
 
-# अब तुम्हारा बाकी सारा code नीचे रहेगा
 st.title("MEDIMIND - Prescription Reader")
+# बाकी तुम्हारा सारा code नीचे…
 
 # ... बाकी तुम्हारा पूरा code वैसा का वैसा
 
@@ -718,6 +709,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
