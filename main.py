@@ -2,9 +2,8 @@ import streamlit as st
 import pandas as pd
 from fuzzywuzzy import fuzz
 import re
+import google.generativeai as genai
 import time
-from google import genai
-from google.genai import types
 import json
 import random
 
@@ -692,6 +691,7 @@ if GEMINI_ENABLED:
     st.markdown('</div>', unsafe_allow_html=True)
 else:
     st.warning("💬 Gemini चैट टूल API की अनुपलब्धता के कारण अक्षम है।")
+
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
