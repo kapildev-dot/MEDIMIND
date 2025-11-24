@@ -270,7 +270,7 @@ def gemini_search_and_diagnose(search_text):
     AI Advice/जेमिनी की सलाह: [Advice in User's Language]
     """
 
-    try:
+   try:
     response = model.generate_content(
         prompt,
         tools=[genai.tools.GoogleSearch()]
@@ -284,6 +284,8 @@ except Exception as e:
         return "Gemini API Error: Server busy है या Rate Limit exceed हो गई है। बाद में कोशिश करें।"
 
     return f"Gemini API Call Error or connection issue: {e}"
+
+  
 
 
 # 🛑 NEW FUNCTION: GEMINI PREVENTIVE TIP (ULTRA-FLEXIBLE MULTILINGUAL PROMPT) 🛑
@@ -714,6 +716,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
