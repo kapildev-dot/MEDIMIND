@@ -3,6 +3,7 @@ import pandas as pd
 from rapidfuzz import fuzz
 import re
 import google.generativeai as genai
+from google.generativeai import types # Add types for config (used in advanced tools/chat)
 import time
 import json
 import random
@@ -270,24 +271,21 @@ def gemini_search_and_diagnose(search_text):
     AI Advice/जेमिनी की सलाह: [Advice in User's Language]
     """
 
-  try:
-    response = model.generate_content(
-        prompt,
-        tools=[genai.tools.GoogleSearch()]
-    )
-    return response.text
+    # CORRECTED INDENTATION
+    try:
+        response = model.generate_content(
+            prompt,
+            tools=[genai.tools.GoogleSearch()]
+        )
+        return response.text
 
-except Exception as e:
-    error_message = str(e)
+    except Exception as e:
+        error_message = str(e)
 
-    if "503" in error_message or "rate limit" in error_message:
-        return "Gemini API Error: Server busy है या Rate Limit exceed हो गई है। बाद में कोशिश करें।"
+        if "503" in error_message or "rate limit" in error_message:
+            return "Gemini API Error: Server busy है या Rate Limit exceed हो गई है। बाद में कोशिश करें।"
 
-    return f"Gemini API Call Error or connection issue: {e}"
-
-
-
-  
+        return f"Gemini API Call Error or connection issue: {e}"
 
 
 # 🛑 NEW FUNCTION: GEMINI PREVENTIVE TIP (ULTRA-FLEXIBLE MULTILINGUAL PROMPT) 🛑
@@ -307,13 +305,13 @@ def gemini_get_preventive_tip(health_score, search_text):
     **CRITICAL**: स्कोर और लक्षणों को ध्यान में रखते हुए, उन्हें एक **एकल, संक्षिप्त, दैनिक निवारक स्वास्थ्य टिप (preventive health tip)** उसी भाषा में दें, जिस भाषा में मुख्य लक्षण दिए गए थे। टिप 15 शब्दों से अधिक नहीं होनी चाहिए।
     """
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
+        # Corrected to use 'model' object instead of 'client.models'
+        response = model.generate_content(
             contents=prompt,
         )
         return response.text
-    except:
-        return "आपके स्वास्थ्य स्कोर के लिए एक खास टिप: आज 7-8 गिलास पानी पिएं! 💧"
+    except Exception as e:
+        return f"आपके स्वास्थ्य स्कोर के लिए एक खास टिप: आज 7-8 गिलास पानी पिएं! 💧 (Error: {e})"
 
 # 🛑 NEW FUNCTION: GEMINI MEDICATION INTERACTION CHECKER (ULTRA-FLEXIBLE MULTILINGUAL PROMPT) 🛑
 def gemini_check_interaction(med_a, med_b):
@@ -336,8 +334,8 @@ def gemini_check_interaction(med_a, med_b):
         config = types.GenerateContentConfig(
             tools=[{"google_search": {}}]
         )
-        response = client.models.generate_content(
-            model=MODEL_NAME,
+        # Corrected to use 'model' object instead of 'client.models'
+        response = model.generate_content(
             contents=prompt,
             config=config,
         )
@@ -358,8 +356,8 @@ def gemini_generate_diet_plan(disease_name):
     कम से कम 3 'क्या खाएं' (Do's) और 3 'क्या न खाएं' (Don'ts) बुलेट पॉइंट्स में प्रदान करें।
     """
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
+        # Corrected to use 'model' object instead of 'client.models'
+        response = model.generate_content(
             contents=prompt,
         )
         return response.text
@@ -660,7 +658,7 @@ if submitted or (st.session_state.get('ui_symptoms') and not input_text.strip())
     with st.expander("🛠️ Advanced Debug Info"):
         st.info(f"AI सर्च टेक्स्ट: **{processed_text}**")
         st.write(f"वर्तमान हेल्थ स्कोर: **{current_score}%**")
-        st.write(f"वर्तमान BMI: **{bmi}** ({bmi_category})")
+        st.write(f"वर्तमान $\text{BMI}$: **{bmi}** ({bmi_category})")
         st.write(f"पहचाने गए लक्षण: **{', '.join(present_symptoms)}**")
 
 else:
@@ -691,8 +689,8 @@ if GEMINI_ENABLED:
                     tools=[{"google_search": {}}]
                 )
                 
-                chat_response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                # Corrected to use 'model' object instead of 'client.models'
+                chat_response = model.generate_content(
                     contents=chat_question,
                     config=config,  # <--- CONFIG ADDED HERE
                 )
@@ -717,18 +715,4 @@ else:
 
 
 
-st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+st.markdown("---")
