@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from fuzz import fuzz
+from rapidfuzz import fuzz    # ✅ Correct Import
 import re
 import google.generativeai as genai
 import time
@@ -25,6 +25,7 @@ except Exception as e:
 
 # --- APP TITLE ---
 st.title("MEDIMIND - Prescription Reader")
+
 
 # ---- Page Config ----
 st.set_page_config(
@@ -714,6 +715,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
