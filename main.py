@@ -7,6 +7,7 @@ from google import genai
 from google.genai import types
 import json
 import random
+import os
 
 # ---- Page Config ----
 st.set_page_config(
@@ -700,4 +701,5 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
