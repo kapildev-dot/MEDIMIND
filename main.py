@@ -4,7 +4,7 @@ from rapidfuzz import fuzz
 import re
 import google.generativeai as genai
 from google.generativeai import types # Keep this for other potential types usage
-from google.generativeai.types import GenerateContentConfig # 🟢 FIX 1: Explicitly import GenerateContentConfig
+# FIX: The explicit import was causing an ImportError. We rely on the alias 'types' now.
 import time
 import json
 import random
@@ -16,7 +16,8 @@ import os
 API_KEY = st.secrets.get("GEMINI_API_KEY")
 
 if not API_KEY:
-    st.error("🚨 Gemini API Key लोड नहीं हुई! कृपया Streamlit Secrets में जोड़ें।")
+    # Changed st.error to st.warning as st.stop() will handle the termination
+    st.warning("🚨 Gemini API Key लोड नहीं हुई! कृपया Streamlit Secrets में जोड़ें।")
     st.stop()
 
 # Correct Gemini configuration
@@ -273,8 +274,8 @@ def gemini_search_and_diagnose(search_text):
     """
 
     try:
-        # 🟢 FIX 1: Use the correct, explicit class import
-        config = GenerateContentConfig(
+        # 🟢 FIX: Use the 'types' alias for GenerateContentConfig
+        config = types.GenerateContentConfig(
             tools=[{"google_search": {}}]
         )
         
@@ -336,8 +337,8 @@ def gemini_check_interaction(med_a, med_b):
     सुरक्षा सलाह/Safety Advice: [सलाह/Advice in user's language]
     """
     try:
-        # 🟢 FIX 1: Use the correct, explicit class import
-        config = GenerateContentConfig(
+        # 🟢 FIX: Use the 'types' alias for GenerateContentConfig
+        config = types.GenerateContentConfig(
             tools=[{"google_search": {}}]
         )
         # Corrected to use 'model' object instead of 'client.models'
@@ -488,11 +489,10 @@ with tab_tracker:
     weight_kg = st.number_input("वजन (Weight in kg)", 20.0, 300.0, st.session_state.weight_kg, 0.1, key="weight_kg")
     height_cm = st.number_input("ऊंचाई (Height in cm)", 50.0, 250.0, st.session_state.height_cm, 1.0, key="height_cm")
     
-    # 🟢 FIX 2: Calculate BMI variables here, which are always run
-    # These variables will now be defined before the main conditional block
+    # Calculate BMI variables here, which are always run
     bmi, bmi_category = calculate_bmi(weight_kg, height_cm) 
 
-    st.caption(f"आपका BMI: **{bmi}** ({bmi_category})")
+    st.caption(f"आपका $\text{BMI}$: **{bmi}** ({bmi_category})")
 
 
     # --- Health Score Display ---
@@ -668,6 +668,7 @@ if submitted or (st.session_state.get('ui_symptoms') and not input_text.strip())
     with st.expander("🛠️ Advanced Debug Info"):
         st.info(f"AI सर्च टेक्स्ट: **{processed_text}**")
         st.write(f"वर्तमान हेल्थ स्कोर: **{current_score}%**")
+        # The variables bmi and bmi_category are correctly defined in the sidebar tab
         st.write(f"वर्तमान $\text{BMI}$: **{bmi}** ({bmi_category})")
         st.write(f"पहचाने गए लक्षण: **{', '.join(present_symptoms)}**")
 
@@ -695,8 +696,8 @@ if GEMINI_ENABLED:
             with st.spinner('⏳ Gemini जवाब तैयार कर रहा है... (Google Search का उपयोग करके)'):
                 
                 # 💥 CRITICAL IMPROVEMENT: Add Google Search Tool configuration
-                # 🟢 FIX 1: Use the correct, explicit class import
-                config = GenerateContentConfig(
+                # 🟢 FIX: Use the 'types' alias for GenerateContentConfig
+                config = types.GenerateContentConfig(
                     tools=[{"google_search": {}}]
                 )
                 
