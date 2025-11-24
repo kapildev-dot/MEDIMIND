@@ -19,16 +19,21 @@ st.set_page_config(
 # ---- 0. GEMINI API INITIALIZATION & TOOLS ----
 
 try:
-    API_KEY = st.secrets["GEMINI_API_KEY"]
+    # Key को सीधे Render Environment Variable से पढ़ें
+    API_KEY = os.environ.get("GEMINI_API_KEY") 
+    
+    # यदि Key नहीं मिलती है, तो एक एरर दें
+    if not API_KEY:
+        raise ValueError("API Key not found in Environment.")
+        
     client = genai.Client(api_key=API_KEY)
     MODEL_NAME = 'gemini-2.5-flash'
     GEMINI_ENABLED = True
 except Exception as e:
-    # Changed to warning for better UX since API is optional for local features
+    # Key न मिलने पर चेतावनी
     st.sidebar.warning("🚨 Gemini API Key लोड नहीं हो पाई। Gemini Validation Disabled.")
     GEMINI_ENABLED = False
     client = None
-
 # ---- 1. PREMIUM CSS STYLING (V10 Enhancements) ----
 
 # Function to render the Health Score as an attractive circle
@@ -695,3 +700,4 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
