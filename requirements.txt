@@ -1,5 +1,5 @@
 streamlit
-google-generativeai
+google-genai       # <-- इसे सही किया गया है
 rapidfuzz
 Pillow
 PyPDF2
