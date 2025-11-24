@@ -1,25 +1,30 @@
 import streamlit as st
 import pandas as pd
-from fuzzywuzzy import fuzz
+from fuzz import fuzz
 import re
 import google.generativeai as genai
 import time
 import json
 import random
+import os
 
-# सिर्फ ये एक बार ही रखो
-try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    st.success("Gemini API Key successfully loaded!")
-except Exception as e:
-    st.error("Gemini API Key error!")
-    st.error(f"Details: {e}")
+# --- LOAD GEMINI API KEY (Best & Correct Method) ---
+API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not API_KEY:
+    st.error("🚨 Gemini API Key लोड नहीं हुई! कृपया Streamlit Secrets में जोड़ें।")
     st.stop()
 
-st.title("MEDIMIND - Prescription Reader")
-# बाकी तुम्हारा सारा code नीचे…
+try:
+    genai.configure(api_key=API_KEY)
+    st.success("Gemini API Key successfully loaded!")
+except Exception as e:
+    st.error("❌ Gemini API Key configure नहीं हो पाई!")
+    st.error(str(e))
+    st.stop()
 
-# ... बाकी तुम्हारा पूरा code वैसा का वैसा
+# --- APP TITLE ---
+st.title("MEDIMIND - Prescription Reader")
 
 # ---- Page Config ----
 st.set_page_config(
@@ -709,6 +714,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
