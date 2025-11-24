@@ -481,27 +481,47 @@ with tab_tracker:
     pain_value = PAIN_LEVELS[pain_level_text]
 
     # --- BMI Inputs ---
-    st.markdown("---")
-    st.subheader("⚖️ $\text{BMI}$ कैलकुलेटर")
-    if 'weight_kg' not in st.session_state: st.session_state.weight_kg = 70.0
-    if 'height_cm' not in st.session_state: st.session_state.height_cm = 170.0
-    
-    weight_kg = st.number_input("वजन (Weight in kg)", 20.0, 300.0, st.session_state.weight_kg, 0.1, key="weight_kg")
-    height_cm = st.number_input("ऊंचाई (Height in cm)", 50.0, 250.0, st.session_state.height_cm, 1.0, key="height_cm")
-    
-    # Calculate BMI variables here, which are always run
-    bmi, bmi_category = calculate_bmi(weight_kg, height_cm) 
+  # --- BMI Inputs ---
+st.markdown("---")
+st.subheader("⚖️ $\text{BMI}$ कैलकुलेटर")
 
-    st.caption(f"आपका $\text{BMI}$: **{bmi}** ({bmi_category})")
+if 'weight_kg' not in st.session_state:
+    st.session_state.weight_kg = 70.0
+if 'height_cm' not in st.session_state:
+    st.session_state.height_cm = 170.0
 
+weight_kg = st.number_input(
+    "वजन (Weight in kg)",
+    20.0,
+    300.0,
+    st.session_state.weight_kg,
+    0.1,
+    key="weight_kg"
+)
 
-    # --- Health Score Display ---
-    current_score = calculate_health_score(temp_calc, pain_value)
+height_cm = st.number_input(
+    "ऊंचाई (Height in cm)",
+    50.0,
+    250.0,
+    st.session_state.height_cm,
+    1.0,
+    key="height_cm"
+)
 
-    st.markdown("---")
-    st.subheader("🚀 आपका हेल्थ स्कोर")
-    render_health_score_circle(current_score)
-    st.caption(f"Temp: **{temp_display}** | Pain: **{pain_level_text}**") # Added display for clarity
+# ---- BMI Always Calculate ----
+bmi, bmi_category = calculate_bmi(weight_kg, height_cm)
+
+st.caption(f"आपका $\text{BMI}$: **{bmi}** ({bmi_category})")
+
+# --- Health Score Display ---
+current_score = calculate_health_score(temp_calc, pain_value)
+
+st.markdown("---")
+st.subheader("🚀 आपका हेल्थ स्कोर")
+
+render_health_score_circle(current_score)
+
+st.caption(f"Temp: **{temp_display}** | Pain: **{pain_level_text}**")
 
 # --- Tab 3: Advanced Gemini Tools ---
 with tab_tools:
@@ -726,3 +746,4 @@ else:
 
 
 st.markdown("---")
+
