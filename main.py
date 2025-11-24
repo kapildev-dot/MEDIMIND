@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from rapidfuzz import fuzz    # ✅ Correct Import
+from rapidfuzz import fuzz
 import re
 import google.generativeai as genai
 import time
@@ -8,26 +8,28 @@ import json
 import random
 import os
 
-# --- LOAD GEMINI API KEY (Best & Correct Method) ---
+# ---------------------------------------------------
+#  FINAL & CORRECT API KEY LOADING (ONLY ONE METHOD)
+# ---------------------------------------------------
 API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not API_KEY:
-    st.error("🚨 Gemini API Key लोड नहीं हुई! कृपया Streamlit Secrets में जोड़ें।")
-    st.stop()
+    st.sidebar.error("🚨 Gemini API Key लोड नहीं हुई! कृपया Streamlit Secrets में जोड़ें।")
+    GEMINI_ENABLED = False
+else:
+    try:
+        genai.configure(api_key=API_KEY)
+        client = genai.Client(api_key=API_KEY)
+        st.sidebar.success("Gemini API Key successfully loaded!")
+        GEMINI_ENABLED = True
+    except Exception as e:
+        st.sidebar.error("❌ Gemini API Key configure नहीं हो पाई!")
+        st.sidebar.error(str(e))
+        GEMINI_ENABLED = False
 
-try:
-    genai.configure(api_key=API_KEY)
-    st.success("Gemini API Key successfully loaded!")
-except Exception as e:
-    st.error("❌ Gemini API Key configure नहीं हो पाई!")
-    st.error(str(e))
-    st.stop()
-
-# --- APP TITLE ---
-st.title("MEDIMIND - Prescription Reader")
-
-
-# ---- Page Config ----
+# ---------------------------------------------------
+# APP START
+# ---------------------------------------------------
 st.set_page_config(
     page_title="MediMind AI Doctor - PRO V10 (Ultimate Professional)",
     page_icon="⭐",
@@ -35,18 +37,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ---- 0. GEMINI API INITIALIZATION & TOOLS ----
-
-try:
-    API_KEY = st.secrets["GEMINI_API_KEY"]
-    client = genai.Client(api_key=API_KEY)
-    MODEL_NAME = 'gemini-2.5-flash'
-    GEMINI_ENABLED = True
-except Exception as e:
-    # Changed to warning for better UX since API is optional for local features
-    st.sidebar.warning("🚨 Gemini API Key लोड नहीं हो पाई। Gemini Validation Disabled.")
-    GEMINI_ENABLED = False
-    client = None
+st.title("MEDIMIND - Prescription Reader")
 
 # ---- 1. PREMIUM CSS STYLING (V10 Enhancements) ----
 
@@ -715,6 +706,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
