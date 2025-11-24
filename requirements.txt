@@ -3,3 +3,4 @@ google-generativeai
 rapidfuzz
 Pillow
 PyPDF2
+requests
