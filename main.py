@@ -1,55 +1,33 @@
 import streamlit as st
 import pandas as pd
-from rapidfuzz import fuzz
+from fuzzywuzzy import fuzz
 import re
-import google.generativeai as genai
-from google.generativeai import types # Keep this for other potential types usage
-# FIX: The explicit import was causing an ImportError. We rely on the alias 'types' now.
 import time
+from google import genai
+from google.genai import types
 import json
 import random
-import os
 
-# ----------------------------------
-# 1) LOAD GEMINI API KEY
-# ----------------------------------
-API_KEY = st.secrets.get("GEMINI_API_KEY")
-
-if not API_KEY:
-    # Changed st.error to st.warning as st.stop() will handle the termination
-    st.warning("🚨 Gemini API Key लोड नहीं हुई! कृपया Streamlit Secrets में जोड़ें।")
-    st.stop()
-
-# Correct Gemini configuration
-try:
-    genai.configure(api_key=API_KEY)
-    MODEL_NAME = "gemini-1.5-flash"
-
-    # Correct model object (no Client, no types)
-    model = genai.GenerativeModel(MODEL_NAME)
-
-    GEMINI_ENABLED = True
-    st.success("Gemini API Key successfully loaded!")
-except Exception as e:
-    st.error("❌ Gemini API Key configure नहीं हो पाई!")
-    st.error(str(e))
-    GEMINI_ENABLED = False
-    model = None
-    st.stop()
-
-# ----------------------------------
-# 2) STREAMLIT PAGE SETTINGS
-# ----------------------------------
+# ---- Page Config ----
 st.set_page_config(
-    page_title="MediMind - Prescription Reader",
-    page_icon="🧠",
-    layout="wide"
+    page_title="MediMind AI Doctor - PRO V10 (Ultimate Professional)",
+    page_icon="⭐",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-st.title("MEDIMIND - Prescription Reader (API Connected)")
-st.write(f"Gemini Status: {'🟢 Active' if GEMINI_ENABLED else '🔴 Inactive'}")
+# ---- 0. GEMINI API INITIALIZATION & TOOLS ----
 
-
+try:
+    API_KEY = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=API_KEY)
+    MODEL_NAME = 'gemini-2.5-flash'
+    GEMINI_ENABLED = True
+except Exception as e:
+    # Changed to warning for better UX since API is optional for local features
+    st.sidebar.warning("🚨 Gemini API Key लोड नहीं हो पाई। Gemini Validation Disabled.")
+    GEMINI_ENABLED = False
+    client = None
 
 # ---- 1. PREMIUM CSS STYLING (V10 Enhancements) ----
 
@@ -274,25 +252,21 @@ def gemini_search_and_diagnose(search_text):
     """
 
     try:
-        # 🟢 FIX: Use the 'types' alias for GenerateContentConfig
         config = types.GenerateContentConfig(
             tools=[{"google_search": {}}]
         )
-        
-        response = model.generate_content(
+        response = client.models.generate_content(
+            model=MODEL_NAME,
             contents=prompt,
-            config=config # Pass the configuration here
+            config=config,
         )
         return response.text
-
     except Exception as e:
         error_message = str(e)
-
-        if "503" in error_message or "rate limit" in error_message:
-            return "Gemini API Error: Server busy है या Rate Limit exceed हो गई है। बाद में कोशिश करें।"
-
+        if "503 UNAVAILABLE" in error_message or "rate limit" in error_message:
+            # Error message translated to be language-neutral when possible
+            return "Gemini API Call Error: Server is busy or rate limit exceeded. Please try again later."
         return f"Gemini API Call Error or connection issue: {e}"
-
 
 # 🛑 NEW FUNCTION: GEMINI PREVENTIVE TIP (ULTRA-FLEXIBLE MULTILINGUAL PROMPT) 🛑
 def gemini_get_preventive_tip(health_score, search_text):
@@ -311,13 +285,13 @@ def gemini_get_preventive_tip(health_score, search_text):
     **CRITICAL**: स्कोर और लक्षणों को ध्यान में रखते हुए, उन्हें एक **एकल, संक्षिप्त, दैनिक निवारक स्वास्थ्य टिप (preventive health tip)** उसी भाषा में दें, जिस भाषा में मुख्य लक्षण दिए गए थे। टिप 15 शब्दों से अधिक नहीं होनी चाहिए।
     """
     try:
-        # Corrected to use 'model' object instead of 'client.models'
-        response = model.generate_content(
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
             contents=prompt,
         )
         return response.text
-    except Exception as e:
-        return f"आपके स्वास्थ्य स्कोर के लिए एक खास टिप: आज 7-8 गिलास पानी पिएं! 💧 (Error: {e})"
+    except:
+        return "आपके स्वास्थ्य स्कोर के लिए एक खास टिप: आज 7-8 गिलास पानी पिएं! 💧"
 
 # 🛑 NEW FUNCTION: GEMINI MEDICATION INTERACTION CHECKER (ULTRA-FLEXIBLE MULTILINGUAL PROMPT) 🛑
 def gemini_check_interaction(med_a, med_b):
@@ -337,12 +311,11 @@ def gemini_check_interaction(med_a, med_b):
     सुरक्षा सलाह/Safety Advice: [सलाह/Advice in user's language]
     """
     try:
-        # 🟢 FIX: Use the 'types' alias for GenerateContentConfig
         config = types.GenerateContentConfig(
             tools=[{"google_search": {}}]
         )
-        # Corrected to use 'model' object instead of 'client.models'
-        response = model.generate_content(
+        response = client.models.generate_content(
+            model=MODEL_NAME,
             contents=prompt,
             config=config,
         )
@@ -363,8 +336,8 @@ def gemini_generate_diet_plan(disease_name):
     कम से कम 3 'क्या खाएं' (Do's) और 3 'क्या न खाएं' (Don'ts) बुलेट पॉइंट्स में प्रदान करें।
     """
     try:
-        # Corrected to use 'model' object instead of 'client.models'
-        response = model.generate_content(
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
             contents=prompt,
         )
         return response.text
@@ -481,47 +454,26 @@ with tab_tracker:
     pain_value = PAIN_LEVELS[pain_level_text]
 
     # --- BMI Inputs ---
-  # --- BMI Inputs ---
-st.markdown("---")
-st.subheader("⚖️ $\text{BMI}$ कैलकुलेटर")
+    st.markdown("---")
+    st.subheader("⚖️ $\text{BMI}$ कैलकुलेटर")
+    if 'weight_kg' not in st.session_state: st.session_state.weight_kg = 70.0
+    if 'height_cm' not in st.session_state: st.session_state.height_cm = 170.0
+    
+    weight_kg = st.number_input("वजन (Weight in kg)", 20.0, 300.0, st.session_state.weight_kg, 0.1, key="weight_kg")
+    height_cm = st.number_input("ऊंचाई (Height in cm)", 50.0, 250.0, st.session_state.height_cm, 1.0, key="height_cm")
+    
+    bmi, bmi_category = calculate_bmi(weight_kg, height_cm)
 
-if 'weight_kg' not in st.session_state:
-    st.session_state.weight_kg = 70.0
-if 'height_cm' not in st.session_state:
-    st.session_state.height_cm = 170.0
+    st.caption(f"आपका BMI: **{bmi}** ({bmi_category})")
 
-weight_kg = st.number_input(
-    "वजन (Weight in kg)",
-    20.0,
-    300.0,
-    st.session_state.weight_kg,
-    0.1,
-    key="weight_kg"
-)
 
-height_cm = st.number_input(
-    "ऊंचाई (Height in cm)",
-    50.0,
-    250.0,
-    st.session_state.height_cm,
-    1.0,
-    key="height_cm"
-)
+    # --- Health Score Display ---
+    current_score = calculate_health_score(temp_calc, pain_value)
 
-# ---- BMI Always Calculate ----
-bmi, bmi_category = calculate_bmi(weight_kg, height_cm)
-
-st.caption(f"आपका $\text{BMI}$: **{bmi}** ({bmi_category})")
-
-# --- Health Score Display ---
-current_score = calculate_health_score(temp_calc, pain_value)
-
-st.markdown("---")
-st.subheader("🚀 आपका हेल्थ स्कोर")
-
-render_health_score_circle(current_score)
-
-st.caption(f"Temp: **{temp_display}** | Pain: **{pain_level_text}**")
+    st.markdown("---")
+    st.subheader("🚀 आपका हेल्थ स्कोर")
+    render_health_score_circle(current_score)
+    st.caption(f"Temp: **{temp_display}** | Pain: **{pain_level_text}**") # Added display for clarity
 
 # --- Tab 3: Advanced Gemini Tools ---
 with tab_tools:
@@ -574,7 +526,6 @@ st.markdown("---")
 
 # ---- 4. HYBRID PREDICTION & OUTPUT ----
 
-# This block is only executed after submission
 if submitted or (st.session_state.get('ui_symptoms') and not input_text.strip()):
 
     # Emergency check (Retained)
@@ -671,7 +622,7 @@ if submitted or (st.session_state.get('ui_symptoms') and not input_text.strip())
     elif gemini_advice and isinstance(gemini_advice, str):
         st.error(f"⚠️ Gemini AI से रियल-टाइम सलाह प्राप्त नहीं हो सकी। कारण: {gemini_advice}")
     else:
-        st.warning("⚠️ Gemini AI से रियल-TIME सलाह प्राप्त नहीं हो सकी।")
+        st.warning("⚠️ Gemini AI से रियल-टाइम सलाह प्राप्त नहीं हो सकी।")
 
     st.markdown("---")
 
@@ -684,12 +635,10 @@ if submitted or (st.session_state.get('ui_symptoms') and not input_text.strip())
 
 
     # Final Warning/Debug Info
-    # BMI variables (bmi, bmi_category) are now guaranteed to be available
     with st.expander("🛠️ Advanced Debug Info"):
         st.info(f"AI सर्च टेक्स्ट: **{processed_text}**")
         st.write(f"वर्तमान हेल्थ स्कोर: **{current_score}%**")
-        # The variables bmi and bmi_category are correctly defined in the sidebar tab
-        st.write(f"वर्तमान $\text{BMI}$: **{bmi}** ({bmi_category})")
+        st.write(f"वर्तमान BMI: **{bmi}** ({bmi_category})")
         st.write(f"पहचाने गए लक्षण: **{', '.join(present_symptoms)}**")
 
 else:
@@ -716,13 +665,12 @@ if GEMINI_ENABLED:
             with st.spinner('⏳ Gemini जवाब तैयार कर रहा है... (Google Search का उपयोग करके)'):
                 
                 # 💥 CRITICAL IMPROVEMENT: Add Google Search Tool configuration
-                # 🟢 FIX: Use the 'types' alias for GenerateContentConfig
                 config = types.GenerateContentConfig(
                     tools=[{"google_search": {}}]
                 )
                 
-                # Corrected to use 'model' object instead of 'client.models'
-                chat_response = model.generate_content(
+                chat_response = client.models.generate_content(
+                    model='gemini-2.5-flash',
                     contents=chat_question,
                     config=config,  # <--- CONFIG ADDED HERE
                 )
@@ -734,6 +682,7 @@ if GEMINI_ENABLED:
             st.session_state.chat_history.append({"role": "ai", "text": f"क्षमा करें, Gemini चैट में त्रुटि आ गई: {e}"})
 
     # Display chat history
+    # NOTE: The LaTeX fix for MediMind AI (removing $) is applied here.
     for message in reversed(st.session_state.chat_history):
         if message["role"] == "user":
             st.markdown(f'**👤 आप:** {message["text"]}')
@@ -745,5 +694,4 @@ else:
     st.warning("💬 Gemini चैट टूल API की अनुपलब्धता के कारण अक्षम है।")
 
 
-st.markdown("---")
-
+st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
