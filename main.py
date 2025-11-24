@@ -271,11 +271,15 @@ def gemini_search_and_diagnose(search_text):
     AI Advice/जेमिनी की सलाह: [Advice in User's Language]
     """
 
-    # CORRECTED INDENTATION
     try:
+        # 🟢 FIX: Use GenerateContentConfig to enable Google Search
+        config = types.GenerateContentConfig(
+            tools=[{"google_search": {}}]
+        )
+        
         response = model.generate_content(
-            prompt,
-            tools=[genai.tools.GoogleSearch()]
+            contents=prompt,
+            config=config # Pass the configuration here
         )
         return response.text
 
@@ -716,3 +720,4 @@ else:
 
 
 st.markdown("---")
+
