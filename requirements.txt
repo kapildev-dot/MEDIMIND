@@ -4,3 +4,5 @@ rapidfuzz
 Pillow
 PyPDF2
 requests
+fuzzywuzzy
+python-Levenshtein
