@@ -38,69 +38,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# ----------------------------------
-# 3) TITLE
-# ----------------------------------
-st.title("🧠 MEDIMIND - Prescription Reader (AI Powered)")
-
-st.write("Gemini API Status:", "🟢 Active" if GEMINI_ENABLED else "🔴 Inactive")
-
-# ----------------------------------
-# 4) USER INPUT SECTION
-# ----------------------------------
-st.subheader("📄 Upload Prescription Image")
-
-uploaded = st.file_uploader("Upload prescription image (JPG/PNG)", type=["jpg", "jpeg", "png"])
-
-# ----------------------------------
-# 5) Process Using Gemini OCR
-# ----------------------------------
-def extract_text_from_image(image_data):
-    """Use Gemini Vision to extract the text from prescription image."""
-
-    response = model.generate_content(
-        [
-            {"mime_type": image_data.type, "data": image_data.getvalue()},
-            "Extract all text from this prescription clearly."
-        ]
-    )
-
-    return response.text
-
-
-if uploaded and GEMINI_ENABLED:
-    st.image(uploaded, caption="Uploaded Prescription", use_column_width=True)
-    st.info("⏳ AI आपकी prescription पढ़ रहा है...")
-
-    try:
-        extracted_text = extract_text_from_image(uploaded)
-        st.success("✅ Text Extracted Successfully!")
-        st.text_area("Extracted Text:", extracted_text, height=250)
-
-    except Exception as e:
-        st.error("❌ Could not process the image.")
-        st.error(str(e))
-
-
-# ----------------------------------
-# 6) Gemini Features Example
-# ----------------------------------
-st.subheader("🤖 Ask Anything About the Extracted Text")
-
-user_q = st.text_input("Ask a question (e.g., 'What medicines are written?')")
-
-if st.button("Generate Answer") and GEMINI_ENABLED:
-    if user_q.strip() == "":
-        st.warning("Please enter a question.")
-    else:
-        with st.spinner("Thinking..."):
-            try:
-                answer = model.generate_content(f"User Query: {user_q}")
-                st.success("Answer:")
-                st.write(answer.text)
-            except Exception as e:
-                st.error("AI Error:")
-                st.error(str(e))
 
 # ---- 1. PREMIUM CSS STYLING (V10 Enhancements) ----
 
@@ -769,6 +706,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
