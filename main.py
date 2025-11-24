@@ -8,26 +8,31 @@ import json
 import random
 import os
 
-# -------------------------------
+# ----------------------------------
 # 1) LOAD GEMINI API KEY
-# -------------------------------
+# ----------------------------------
 API_KEY = st.secrets.get("GEMINI_API_KEY")
 
 if not API_KEY:
     st.error("🚨 Gemini API Key लोड नहीं हुई! कृपया Streamlit Secrets में जोड़ें।")
     st.stop()
 
-# Configure Gemini
+# Correct Gemini configuration
 try:
     genai.configure(api_key=API_KEY)
     MODEL_NAME = "gemini-1.5-flash"
+
+    # Correct model object (no Client, no types)
     model = genai.GenerativeModel(MODEL_NAME)
+
     GEMINI_ENABLED = True
+    st.success("Gemini API Key successfully loaded!")
 except Exception as e:
     st.error("❌ Gemini API Key configure नहीं हो पाई!")
     st.error(str(e))
     GEMINI_ENABLED = False
     model = None
+    st.stop()
 
 # ----------------------------------
 # 2) STREAMLIT PAGE SETTINGS
@@ -37,6 +42,10 @@ st.set_page_config(
     page_icon="🧠",
     layout="wide"
 )
+
+st.title("MEDIMIND - Prescription Reader (API Connected)")
+st.write(f"Gemini Status: {'🟢 Active' if GEMINI_ENABLED else '🔴 Inactive'}")
+
 
 
 # ---- 1. PREMIUM CSS STYLING (V10 Enhancements) ----
@@ -706,6 +715,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
