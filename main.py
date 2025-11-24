@@ -271,21 +271,20 @@ def gemini_search_and_diagnose(search_text):
     """
 
     try:
-        config = types.GenerateContentConfig(
-            tools=[{"google_search": {}}]
-        )
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt,
-            config=config,
-        )
-        return response.text
-    except Exception as e:
-        error_message = str(e)
-        if "503 UNAVAILABLE" in error_message or "rate limit" in error_message:
-            # Error message translated to be language-neutral when possible
-            return "Gemini API Call Error: Server is busy or rate limit exceeded. Please try again later."
-        return f"Gemini API Call Error or connection issue: {e}"
+    response = model.generate_content(
+        prompt,
+        tools=[genai.tools.GoogleSearch()]
+    )
+    return response.text
+
+except Exception as e:
+    error_message = str(e)
+
+    if "503" in error_message or "rate limit" in error_message:
+        return "Gemini API Error: Server busy है या Rate Limit exceed हो गई है। बाद में कोशिश करें।"
+
+    return f"Gemini API Call Error or connection issue: {e}"
+
 
 # 🛑 NEW FUNCTION: GEMINI PREVENTIVE TIP (ULTRA-FLEXIBLE MULTILINGUAL PROMPT) 🛑
 def gemini_get_preventive_tip(health_score, search_text):
@@ -715,6 +714,7 @@ else:
 
 
 st.caption("© 2025 MediMind Ultimate PRO V10 | **Disclaimer:** यह AI सिमुलेशन है – अंतिम और सटीक निदान के लिए हमेशा एक योग्य डॉक्टर से सलाह लें।")
+
 
 
 
