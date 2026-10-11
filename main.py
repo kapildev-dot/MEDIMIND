@@ -67,6 +67,13 @@ def ask_gemini(prompt: str, search: bool = False):
         return None, f"Gemini error: {msg}"
 
 
+def show_ai(ans, err):
+    if ans:
+        st.markdown(ans)
+    else:
+        st.error(err or "जवाब नहीं मिला।")
+
+
 # =====================================================================
 # 2. DESIGN SYSTEM (CSS)
 # =====================================================================
@@ -629,7 +636,7 @@ with tab_med:
                         search=True,
                     )
                 with st.container(border=True):
-                    st.markdown(ans) if ans else st.error(err)
+                    show_ai(ans, err)
             else:
                 st.warning("दोनों दवाओं के नाम लिखें।")
     else:
@@ -643,7 +650,7 @@ with tab_med:
                         search=True,
                     )
                 with st.container(border=True):
-                    st.markdown(ans) if ans else st.error(err)
+                    show_ai(ans, err)
             else:
                 st.warning("दवा का नाम लिखें।")
     st.caption("⚠️ कोई भी दवा शुरू या बंद करने से पहले डॉक्टर / फार्मासिस्ट से पूछें।")
@@ -666,7 +673,7 @@ with tab_diet:
                     "and a **1-day sample meal plan** (breakfast, lunch, snack, dinner). Reply in the language of the condition name."
                 )
             with st.container(border=True):
-                st.markdown(ans) if ans else st.error(err)
+                show_ai(ans, err)
         else:
             st.warning("रोग / स्थिति का नाम लिखें।")
 
